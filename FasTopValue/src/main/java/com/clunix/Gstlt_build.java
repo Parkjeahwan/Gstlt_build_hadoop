@@ -25,7 +25,7 @@ import com.clunix.NLP.graph.Node;
 import com.clunix.NLP.graph.SGraph;
 
 public class Gstlt_build extends Configured implements Tool {
-	public static class Gstlt_build_Mapper extends Mapper<Object, Text, Text, Text> {
+	public static class Gstlt_build_Mapper extends Mapper<Object, Text, Text, Object> {
 		HashMap<String, Integer> vlnoun_data = new HashMap<String, Integer>();
 		int d = 0;
 
@@ -54,50 +54,24 @@ public class Gstlt_build extends Configured implements Tool {
 			String line = value.toString();
 			String infos[] = line.split("\t");
 
-			key1.set(infos[1]);
-			
 			SGraph g = Gstlt_utils.buildGstaltMAX(infos[0], vlnoun_data);
-			FileSystem hdfs;
-			hdfs = FileSystem.get(new Configuration());
-			Path homeDir = hdfs.getHomeDirectory();
-
-			Path path = new Path(homeDir + "/output/" + key.toString() + ".node");
-			BufferedWriter filen = new BufferedWriter(new OutputStreamWriter(hdfs.create(path,true)));
-			path = new Path(homeDir + "/output/" + key.toString() + ".PREV");
-			BufferedWriter fileP = new BufferedWriter(new OutputStreamWriter(hdfs.create(path,true)));
-			path = new Path(homeDir + "/output/" + key.toString() + ".SUCC");
-			BufferedWriter fileS = new BufferedWriter(new OutputStreamWriter(hdfs.create(path,true)));
-			path = new Path(homeDir + "/output/" + key.toString() + ".EQUI");
-			BufferedWriter fileE = new BufferedWriter(new OutputStreamWriter(hdfs.create(path,true)));
-			filen.write(g.node.size()+"\n");
-			int i = 0;
-			for (Node x:g.node) { if (i++ %10000 == 0) System.out.println(i-1 + ":" + x.content); x.fileout(filen);} 
-			filen.close();
-			fileP.write(g.PREV.size()+"\n");
-			for (EdgeSet e:g.PREV) e.fileout(fileP); 
-			fileP.close();
-			fileS.write(g.SUCC.size()+"\n");
-			for (EdgeSet e:g.SUCC) e.fileout(fileS); 
-			fileS.close();
-			fileE.write(g.EQUI.size()+"\n");
-			for (EdgeSet e:g.EQUI) e.fileout(fileE); 
-			fileE.close();
-			context.write(key1, key1);
+			key1.set(infos[1]);
+			context.write(key1, g);
 		}
 	}
 	
-	public static class Gstlt_build_Combiner extends Reducer<Text, Text, Text, Text> {
+	public static class Gstlt_build_Combiner extends Reducer<Text, Object, Text, Object> {
 		Text result = new Text();
-		public void reduce(Text key, Iterable<Text> values, Context context)
+		public void reduce(Text key, Iterable<SGraph> values, Context context)
 				throws IOException, InterruptedException {
-			for (Text g :values ) {
+			for (SGraph g :values ) {
 				result.set(g.toString());
 				context.write(key, result);
 			}
 		}
 	}
 
-	public static class Gstlt_build_Reducer extends Reducer<Text, Text, Text, Text> {
+	public static class Gstlt_build_Reducer extends Reducer<Text, Object, Text, Object> {
 		Text result = new Text();
 		public void reduce(Text key, Iterable<Text> values, Context context)
 				throws IOException, InterruptedException {
@@ -124,11 +98,13 @@ public class Gstlt_build extends Configured implements Tool {
 		conf.set("mapred.textoutputformat.separator", "\t");
 		Job job = Job.getInstance(conf, "Fas Top value");
 		job.setJarByClass(Gstlt_build.class);
-		job.setCombinerClass(Gstlt_build_Combiner.class);
+		
 		job.setMapperClass(Gstlt_build_Mapper.class);
+		job.setCombinerClass(Gstlt_build_Combiner.class);
 		job.setReducerClass(Gstlt_build_Reducer.class);
+		
 		job.setOutputKeyClass(Text.class);
-		job.setOutputValueClass(Text.class);
+		job.setOutputValueClass(SGraph.class);
 
 		Path inputPath = new Path(args[0]);
 		Path outputPath = new Path(args[1]);
