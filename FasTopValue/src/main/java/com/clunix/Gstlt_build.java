@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.FileSystem;
@@ -20,6 +19,10 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
+
+import com.clunix.NLP.graph.EdgeSet;
+import com.clunix.NLP.graph.Node;
+import com.clunix.NLP.graph.SGraph;
 
 public class Gstlt_build extends Configured implements Tool {
 	public static class Gstlt_build_Mapper extends Mapper<Object, Text, Text, Text> {

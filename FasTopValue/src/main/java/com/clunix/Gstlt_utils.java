@@ -8,6 +8,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import com.clunix.NLP.graph.Node;
+import com.clunix.NLP.graph.SGraph;
+
 public class Gstlt_utils {
 	final private static List<String> V 	// 용언 리스트 
 	= Arrays.asList("VV", "VA", "VX", "XSV", "XSA", "VCP", "VCN");

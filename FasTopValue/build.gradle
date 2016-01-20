@@ -17,14 +17,20 @@ mainClassName = 'com.clunix.Gstlt_build'
 repositories {
     // Use 'jcenter' for resolving your dependencies.
     // You can declare any Maven/Ivy/file repository here.
+    mavenLocal()
     jcenter()
 }
+
+//println repositories.localRepository.name
 
 // In this section you declare the dependencies for your production and test code
 dependencies {
     // The production code uses the SLF4J logging API at compile time
     compile 'org.slf4j:slf4j-api:1.7.13'
 
+    // libs
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    
     // Hadoop
     def hadoopVersion = '2.6.0'
     compile "org.apache.hadoop:hadoop-common:$hadoopVersion"
