@@ -1,13 +1,7 @@
 package com.clunix;
-import java.io.Externalizable;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectOutput;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 // v1.1 every contexts instance has HashSet, not HashMap
 public class Contexts implements Serializable{
 	HashSet <Integer> map;

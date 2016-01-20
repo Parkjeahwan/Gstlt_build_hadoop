@@ -1,12 +1,10 @@
 package com.clunix;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
@@ -41,7 +39,7 @@ public class Gstlt_build extends Configured implements Tool {
 			"JX", "EF", "EC", "ECS", "ETN");
 
 	public static class Gstlt_build_Mapper extends Mapper<Text, Object, Text, Object> {
-		HashMap<String, Integer> vlnoun_data;
+		HashMap<String, Integer> vlnoun_data = new HashMap<>();
 		int d = 0;
 
 		public Gstlt_build_Mapper(){
