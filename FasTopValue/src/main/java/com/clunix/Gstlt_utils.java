@@ -26,7 +26,7 @@ public class Gstlt_utils {
 	final private static List<String> E // 어미 리스트
 	= Arrays.asList("EP", "EF", "EC" ,"ECS" ,"ETN", "ETM");
 
-	private static HashMap<String, Integer> vlnoun_data = new HashMap<String, Integer>();
+	private static HashMap<String, Integer> vlnoun_data;
 
 	public static SGraph loadGstalt(String fn) throws IOException, InterruptedException {
 		SGraph g = new SGraph();
@@ -42,109 +42,106 @@ public class Gstlt_utils {
 		return line.substring(0,line.lastIndexOf(a[len-1])).lastIndexOf(a[0]);
 	}
 
-	public static SGraph buildGstaltMAX(String fn) throws IOException, InterruptedException {
-		System.out.println("MAXimum Predicate GSTALT building starts");
-		set_vlnoun("/tmp/mecab_vlnoun.txt");
-		ArrayList <String> C = loadCorpus(fn);
+	public static SGraph buildGstaltMAX(String line, HashMap<String, Integer> vlnoun_data_out) throws IOException, InterruptedException {
+		vlnoun_data = vlnoun_data_out;
 		SGraph g = new SGraph();
 		int lastpi, prevlastpi;
 		int i = 0;
 		lastpi = prevlastpi = -1;
 		String oline;
-		for (String line : C) {
-			Node na, nb, nm;
-			oline = line;
-			//			System.out.println(line);
-			String lastp,lastn;
-			lastp = P_stem(line); 
 
-			lastn = N_stem(line);
-			int lpi,lni;
-			lpi = lastp==null||lastp.equals("")? -1:line.lastIndexOf(lastp.split(" ")[0]) ;
-			lni = lastn==null||lastn.equals("")? -1:line.lastIndexOf(lastn.split(" ")[0]) ;
-			if (lni>=1 && lpi < lni) { 
-				String substr = line.substring(0,lni-1); String[] ssa = substr.split(" ");
-				for (int i0=ssa.length-1;i0>=0;i0--) {
-					String mpm = ssa[i0];
-					if (mpm.contains("/ETM")) {
-						//						prev morpheme continuums =>lastn including lastp;
-						na = g.addNode(lastp);
-						nm = g.addNode(mpm);
-						nb = g.addNode(lastn);
-						addGstalt(na,nm,nb,g);
-						break;
-					}
-					else if (mpm.contains("/JC")) break;
-					else if (mpm.contains("/J")) {
-						String plastn = N_stem(substr);
-						if (plastn == null || plastn.equals("")) break; //{System.out.println(line);nm = g.addNode(mpm);	nb = g.addNode(lastn);addGstalt(nm,nb,g);break;} 
-						na = g.addNode(plastn);
-						nm = g.addNode(mpm);
-						nb = g.addNode(lastn);
-						addGstalt(na,nm,nb,g);
-						break;
-					}
-					else {
-						//						last prev morpheme continuum=>lastn;
-						na = g.addNode(mpm);
-						nb = g.addNode(lastn);
-						addGstalt(na,nb,g);
-						break;
-					}
+		Node na, nb, nm;
+		oline = line;
+		//			System.out.println(line);
+		String lastp,lastn;
+		lastp = P_stem(line); 
+
+		lastn = N_stem(line);
+		int lpi,lni;
+		lpi = lastp==null||lastp.equals("")? -1:line.lastIndexOf(lastp.split(" ")[0]) ;
+		lni = lastn==null||lastn.equals("")? -1:line.lastIndexOf(lastn.split(" ")[0]) ;
+		if (lni>=1 && lpi < lni) { 
+			String substr = line.substring(0,lni-1); String[] ssa = substr.split(" ");
+			for (int i0=ssa.length-1;i0>=0;i0--) {
+				String mpm = ssa[i0];
+				if (mpm.contains("/ETM")) {
+					//						prev morpheme continuums =>lastn including lastp;
+					na = g.addNode(lastp);
+					nm = g.addNode(mpm);
+					nb = g.addNode(lastn);
+					addGstalt(na,nm,nb,g);
+					break;
+				}
+				else if (mpm.contains("/JC")) break;
+				else if (mpm.contains("/J")) {
+					String plastn = N_stem(substr);
+					if (plastn == null || plastn.equals("")) break; //{System.out.println(line);nm = g.addNode(mpm);	nb = g.addNode(lastn);addGstalt(nm,nb,g);break;} 
+					na = g.addNode(plastn);
+					nm = g.addNode(mpm);
+					nb = g.addNode(lastn);
+					addGstalt(na,nm,nb,g);
+					break;
+				}
+				else {
+					//						last prev morpheme continuum=>lastn;
+					na = g.addNode(mpm);
+					nb = g.addNode(lastn);
+					addGstalt(na,nb,g);
+					break;
 				}
 			}
+		}
 
-			while (!lastp.equals("")) { 
-				lastpi = offsetOfP(line,lastp);
-				String target, prevlastp, pline0;
-				target = prevlastp = pline0 = null;
+		while (!lastp.equals("")) { 
+			lastpi = offsetOfP(line,lastp);
+			String target, prevlastp, pline0;
+			target = prevlastp = pline0 = null;
 
-				boolean NOP = false;
-				while (true){
-					String nfpr,ap0[];
-					if (lastpi+lastp.length() <= line.length()) {
-						if (((pline0 = line.substring(lastpi+lastp.length())).indexOf("/E")) >= 0 ||
-								pline0.indexOf("게/JKB") >=0 || pline0.indexOf("게/EC") >=0) {
-							ap0 = pline0.split(" ");
-							for (String mpm:ap0) {
-								if (!mpm.contains("/")) continue;
-								else if (mpm.contains("/E"))
-									if(mpm.contains("/ETM") || mpm.contains("게/EC")){
-										NOP = true; break;}
-									else if  (mpm.contains("/ECS")) 
-										if ((nfpr=NFPR(pline0)).endsWith("/ETM") || nfpr.endsWith("게/JKB")  || nfpr.endsWith("게/ECS") ){ NOP = true; break;} // NFPR returns Nearst Following Predicate's Relators
-										else { break; }
-									else continue;
-								else if (mpm.contains("게/JKB")) {
-									NOP = true; break;} 
-								else break;
-							}
+			boolean NOP = false;
+			while (true){
+				String nfpr,ap0[];
+				if (lastpi+lastp.length() <= line.length()) {
+					if (((pline0 = line.substring(lastpi+lastp.length())).indexOf("/E")) >= 0 ||
+							pline0.indexOf("게/JKB") >=0 || pline0.indexOf("게/EC") >=0) {
+						ap0 = pline0.split(" ");
+						for (String mpm:ap0) {
+							if (!mpm.contains("/")) continue;
+							else if (mpm.contains("/E"))
+								if(mpm.contains("/ETM") || mpm.contains("게/EC")){
+									NOP = true; break;}
+								else if  (mpm.contains("/ECS")) 
+									if ((nfpr=NFPR(pline0)).endsWith("/ETM") || nfpr.endsWith("게/JKB")  || nfpr.endsWith("게/ECS") ){ NOP = true; break;} // NFPR returns Nearst Following Predicate's Relators
+									else { break; }
+								else continue;
+							else if (mpm.contains("게/JKB")) {
+								NOP = true; break;} 
+							else break;
 						}
 					}
-					else System.out.println(line);
+				}
+				else System.out.println(line);
 
-					if (!NOP) break;	
-					NOP = false;
-					line = line.substring(0, lastpi);
-					lastp = P_stem(line);
-					if (lastp.equals("")) break;
-					lastpi = offsetOfP(line,lastp);
-				} // end of inner while
+				if (!NOP) break;	
+				NOP = false;
+				line = line.substring(0, lastpi);
+				lastp = P_stem(line);
 				if (lastp.equals("")) break;
-				prevlastp = P_stem(line = line.substring(0,lastpi));
-				prevlastpi = prevlastp.equals("") ?  0 : offsetOfP(line,prevlastp);
-				Node np = g.addNode(lastp); 
-				target = line.substring(prevlastpi);
-				//		System.out.println("\t\t"+target);
-				findGstalt(target,np,np,g);
-				if (d != 0 )
-					System.out.println("");
-				lastp = prevlastp;
-			} // end of outer while
-			if (i++ % 10000 == 0) System.out.println((i-1) +" th sentence : "+oline+"- predicate "+lastp);
-		}
+				lastpi = offsetOfP(line,lastp);
+			} // end of inner while
+			if (lastp.equals("")) break;
+			prevlastp = P_stem(line = line.substring(0,lastpi));
+			prevlastpi = prevlastp.equals("") ?  0 : offsetOfP(line,prevlastp);
+			Node np = g.addNode(lastp); 
+			target = line.substring(prevlastpi);
+			//		System.out.println("\t\t"+target);
+			findGstalt(target,np,np,g);
+			if (d != 0 )
+				System.out.println("");
+			lastp = prevlastp;
+		} // end of outer while
+		if (i++ % 10000 == 0) System.out.println((i-1) +" th sentence : "+oline+"- predicate "+lastp);
+
 		System.out.println("Total "+g.G.size()+" nodes registered");
-		g.fileout(fn+".PgstaltMAX");
 		return g;
 	}
 
