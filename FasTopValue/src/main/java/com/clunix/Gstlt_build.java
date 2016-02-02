@@ -25,7 +25,7 @@ import com.clunix.NLP.graph.Node;
 import com.clunix.NLP.graph.SGraph;
 
 public class Gstlt_build extends Configured implements Tool {
-	public static class Gstlt_build_Mapper extends Mapper<Object, Text, Text, Object> {
+	public static class Gstlt_build_Mapper extends Mapper<Object, Object, Text, Object> {
 		HashMap<String, Integer> vlnoun_data = new HashMap<String, Integer>();
 		int d = 0;
 
@@ -48,7 +48,7 @@ public class Gstlt_build extends Configured implements Tool {
 			}
 		}
 		
-		public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+		public void map(Object key, Object value, Context context) throws IOException, InterruptedException {
 			Text key1 = new Text();
 
 			String line = value.toString();
