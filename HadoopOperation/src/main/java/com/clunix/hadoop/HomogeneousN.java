@@ -163,10 +163,12 @@ public class HomogeneousN extends Configured implements Tool
 		Text result = new Text();
 		public void reduce(Text key, Iterable<Text> values, Context context)
 				throws IOException, InterruptedException {
+			String str = "";
 			for (Text val :values ) {
-				result.set(val.toString());
-				context.write(key, result);
+				str += val.toString();
 			}
+			result.set(str);
+			context.write(key, result);
 		}
 	}
 
