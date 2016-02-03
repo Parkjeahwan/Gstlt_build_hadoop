@@ -46,3 +46,9 @@ uploadArchives {
        }
     }
 }
+
+jar {
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+}

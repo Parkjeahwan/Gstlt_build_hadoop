@@ -35,7 +35,7 @@ public class HomogeneousN extends Configured implements Tool
 	final private static List<String> Sub //체언 리스트
 	= Arrays.asList("NNG", "NNP", "NNB", "NNBC", "NR", "NP", "SN" ,"XSN" ,"SL", "ETN", "XR");
 
-	public static class HomogeneousN_Mapper extends Mapper<Object, Object, Text, Text> {
+	public static class HomogeneousN_Mapper extends Mapper<Object, Text, Text, Text> {
 		SGraph G = new SGraph();
 		PGraph CC = new PGraph();	
 		List <Node> KNL = new ArrayList <Node> ();
@@ -129,7 +129,7 @@ public class HomogeneousN extends Configured implements Tool
 			return v;
 		}
 
-		public void map(Text key, Text value, Context context) throws IOException, InterruptedException {
+		public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
 			Text key1 = new Text();
 			Text result = new Text();
 
