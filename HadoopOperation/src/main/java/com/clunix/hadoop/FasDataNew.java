@@ -31,16 +31,32 @@ public class FasDataNew extends Configured implements Tool
 				//HashSet <String> tested = new HashSet <String> (); 
 				for (int j=i+1;j<m.length;j++) {
 					String m2 = m[j];
+					
 					//길이가 1인 형태소 끼리 출현한 문장의 횟수
 					//if (m1.equals(m2) || tested.contains(m2)) continue;
 					//else tested.add(m2);
+					
 					//길이가 1인 형태소들이 출현한 횟수(전체에서 카운트)
 					if (m1.equals(m2)) continue;
+					
 					String key2 = m1 + " " + m2;
 					key1.set(key2);
 					context.write(key1, one);
 				}
 			}	
+		}
+	}
+	
+	public static class FasDataNew_Combiner extends Reducer<Text, LongWritable, Text, LongWritable> {
+		private LongWritable result = new LongWritable();
+		public void reduce(Text key, Iterable<LongWritable> values, Context context)
+				throws IOException, InterruptedException {
+			long sum = 0;
+			for (LongWritable val :values ) {
+				sum += val.get();
+			}
+			result.set(sum);
+			context.write(key, result);
 		}
 	}
 	
@@ -75,6 +91,7 @@ public class FasDataNew extends Configured implements Tool
 		job.setJarByClass(FasDataNew.class);
 
 		job.setMapperClass(FasDataNew_Mapper.class);
+		job.setCombinerClass(FasDataNew_Combiner.class);
 		job.setReducerClass(FasDataNew_Reducer.class);
 
 		job.setOutputKeyClass(Text.class);

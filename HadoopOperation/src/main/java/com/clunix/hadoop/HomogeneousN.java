@@ -133,14 +133,14 @@ public class HomogeneousN extends Configured implements Tool
 			Text key1 = new Text();
 			Text result = new Text();
 
-			String line = value.toString();
-			String infos[] = line.split("\t");
+			String word = value.toString();
+			
 
 			List<NodeInt> nl;
 			ArrayList <StrInt> r = new ArrayList <StrInt>();
 			HashMap<String, List<NodeInt>> dict = new HashMap<String, List<NodeInt>>();
 
-			nl = Ndict(G, CC, dict, infos[1], 20, KNL);  // function to MAP
+			nl = Ndict(G, CC, dict, word, 20, KNL);  // function to MAP
 			if (nl != null && !nl.isEmpty()) {
 				for (NodeInt i:nl) {
 					if (i != null) {
@@ -148,9 +148,10 @@ public class HomogeneousN extends Configured implements Tool
 					}
 				}
 			}
+			
 			String s;
-			key1.set(infos[1]);
-			s = "\t"+infos[2]+" th 체언: "+infos[1] + " /"+G.SUCC.get(Integer.valueOf(infos[0])).count.size()+" ~ ";
+			key1.set(word);
+			s =" ~ ";
 			for (StrInt si:r){
 				s += si.str + "/" +si.num+ ", ";
 			}
