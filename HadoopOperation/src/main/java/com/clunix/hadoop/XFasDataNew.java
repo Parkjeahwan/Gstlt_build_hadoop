@@ -27,7 +27,6 @@ public class XFasDataNew extends Configured implements Tool
 		private final static LongWritable one = new LongWritable(1);
 
 		public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-			//context.getTaskAttemptID().getTaskID().getId();
 			Text key1 = new Text();
 			String line = value.toString();
 			String m[] = line.split(" ");
