@@ -15,7 +15,7 @@ repositories {
     mavenCentral()
 }
 
-mainClassName = 'com.clunix.hadoop.XFasDataNew'
+mainClassName = 'com.clunix.hadoop.XFasDataNew3'
 
 dependencies {
     compile group: 'commons-collections', name: 'commons-collections', version: '3.2'

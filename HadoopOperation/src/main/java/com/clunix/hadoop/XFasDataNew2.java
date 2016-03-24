@@ -1,10 +1,7 @@
 package com.clunix.hadoop;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
@@ -16,41 +13,30 @@ import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
+import org.apache.hadoop.mapreduce.Reducer.Context;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-public class NFasDataNew extends Configured implements Tool
+import com.clunix.NLP.graph.SGraph;
+
+public class XFasDataNew2 extends Configured implements Tool
 {
 	public static class NFasDataNew_Mapper extends Mapper<Object, Text, Text, LongWritable> {
 		private final static LongWritable one = new LongWritable(1);
 
 		public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-			//context.getTaskAttemptID().getTaskID().getId();
 			Text key1 = new Text();
 			String line = value.toString();
-			String m[] = line.split(" ");
+			String m[] = line.split("##SP");
 
-			int u = 4;
-			for (int k0=1;k0<=u;k0++) {
-				for (int k1=1;k1<=u;k1++) {
-					for (int i=0;i<m.length-k0+1;i++) {
-						String m1 = "";
-						HashSet <String> tested = new HashSet <String> ();
-						for (int ii=i;ii<i+k0;ii++) m1 += m1.equals("")? m[ii] : " "+m[ii];
-						for (int j=i+k0;j<m.length-k1+1;j++) {
-							String m2 = "";
-							for (int jj=j;jj<j+k1;jj++) m2 += m2.equals("")? m[jj]:" "+m[jj];
-							if (m1.equals(m2) || tested.contains(m2)) continue;
-							else tested.add(m2);
-							String keys = m1 + " ##SP " + m2;
-							key1.set(keys);
-							context.write(key1, one);
-						}
-					}
-				}
+			for(String word:m){
+				word = word.trim();
+				key1.set(word);
+				context.write(key1, one);
 			}
+			
 		}
 	}
 	
@@ -82,7 +68,7 @@ public class NFasDataNew extends Configured implements Tool
 	}
 
 	public static void main(String[] args) throws Exception {
-		int res = ToolRunner.run(new Configuration(), new NFasDataNew(), args);
+		int res = ToolRunner.run(new Configuration(), new XFasDataNew2(), args);
 		System.exit(res);
 	}
 
@@ -98,7 +84,7 @@ public class NFasDataNew extends Configured implements Tool
 		Job job = Job.getInstance(conf, "Fas Data New get");
 		job.getConfiguration().setBoolean("mapred.output.compress", true);
 		job.getConfiguration().setClass("mapred.output.compression.codec", GzipCodec.class, CompressionCodec.class);
-		job.setJarByClass(NFasDataNew.class);
+		job.setJarByClass(XFasDataNew2.class);
 
 		job.setMapperClass(NFasDataNew_Mapper.class);
 		job.setCombinerClass(NFasDataNew_Combiner.class);

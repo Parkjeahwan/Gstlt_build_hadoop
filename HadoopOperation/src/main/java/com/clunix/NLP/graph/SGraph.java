@@ -262,7 +262,7 @@ public class SGraph extends AGraph implements Externalizable
 				node, G, SUCC, PREV, EQUI);
 	}
 
-	@Override
+	/*@Override
 	public void writeExternal(ObjectOutput out) throws IOException
 	{
 		super.writeExternal(out);
@@ -277,5 +277,5 @@ public class SGraph extends AGraph implements Externalizable
 		super.readExternal(in);
 		PREV = (List<EdgeSet>) in.readObject();
 		SUCC = (List<EdgeSet>) in.readObject();
-	}
+	}*/
 }

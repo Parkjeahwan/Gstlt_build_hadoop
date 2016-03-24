@@ -1,13 +1,13 @@
 package com.clunix.hadoop;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -21,36 +21,83 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-public class NFasDataNew extends Configured implements Tool
+public class XFasDataNew3 extends Configured implements Tool
 {
 	public static class NFasDataNew_Mapper extends Mapper<Object, Text, Text, LongWritable> {
 		private final static LongWritable one = new LongWritable(1);
+		HashMap<String, Integer> appear = new HashMap<String, Integer>();
 
+		public NFasDataNew_Mapper(){
+			FileSystem hdfs;
+			try {
+				hdfs = FileSystem.get(new Configuration());
+				Path homeDir = hdfs.getHomeDirectory();
+				Path path = new Path(homeDir + "/count_morpheme4.txt");
+				BufferedReader br = new BufferedReader(new InputStreamReader(hdfs.open(path)));
+
+				String line;
+				System.out.println("start input data");
+				while ((line = br.readLine()) != null) {
+					String arr[] = line.split("\t");
+					appear.put(arr[0], Integer.valueOf(arr[1]));
+				}
+				br.close();
+			}
+			catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 		public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-			//context.getTaskAttemptID().getTaskID().getId();
 			Text key1 = new Text();
 			String line = value.toString();
-			String m[] = line.split(" ");
+			String m[] = line.split("##SP");
 
-			int u = 4;
-			for (int k0=1;k0<=u;k0++) {
-				for (int k1=1;k1<=u;k1++) {
-					for (int i=0;i<m.length-k0+1;i++) {
-						String m1 = "";
-						HashSet <String> tested = new HashSet <String> ();
-						for (int ii=i;ii<i+k0;ii++) m1 += m1.equals("")? m[ii] : " "+m[ii];
-						for (int j=i+k0;j<m.length-k1+1;j++) {
-							String m2 = "";
-							for (int jj=j;jj<j+k1;jj++) m2 += m2.equals("")? m[jj]:" "+m[jj];
-							if (m1.equals(m2) || tested.contains(m2)) continue;
-							else tested.add(m2);
-							String keys = m1 + " ##SP " + m2;
-							key1.set(keys);
-							context.write(key1, one);
-						}
-					}
+			for(String word:m){
+				word = word.trim();
+				int count = 0;
+				if(appear.containsKey(word)){
+					count = appear.get(word);
+				} else {	
+					continue;
+				}
+				if (count == 1) {
+					key1.set("morpheme1");
+					context.write(key1, one);
+				} else if (count == 2) {
+					key1.set("morpheme2");
+					context.write(key1, one);
+				} else if (count == 3) {
+					key1.set("morpheme3");
+					context.write(key1, one);
+				} else if (count == 4) {
+					key1.set("morpheme4");
+					context.write(key1, one);
+				} else if (count == 5) {
+					key1.set("morpheme5");
+					context.write(key1, one);
+				} else if (count == 6) {
+					key1.set("morpheme6");
+					context.write(key1, one);
+				} else if (count == 7) {
+					key1.set("morpheme7");
+					context.write(key1, one);
+				} else if (count == 8) {
+					key1.set("morpheme8");
+					context.write(key1, one);
+				} else if (count == 9) {
+					key1.set("morpheme9");
+					context.write(key1, one);
+				} else if (count == 10) {
+					key1.set("morpheme10");
+					context.write(key1, one);
+				} else {
+					key1.set("morpheme11");
+					context.write(key1, one);
 				}
 			}
+			
 		}
 	}
 	
@@ -82,7 +129,7 @@ public class NFasDataNew extends Configured implements Tool
 	}
 
 	public static void main(String[] args) throws Exception {
-		int res = ToolRunner.run(new Configuration(), new NFasDataNew(), args);
+		int res = ToolRunner.run(new Configuration(), new XFasDataNew3(), args);
 		System.exit(res);
 	}
 
@@ -98,7 +145,7 @@ public class NFasDataNew extends Configured implements Tool
 		Job job = Job.getInstance(conf, "Fas Data New get");
 		job.getConfiguration().setBoolean("mapred.output.compress", true);
 		job.getConfiguration().setClass("mapred.output.compression.codec", GzipCodec.class, CompressionCodec.class);
-		job.setJarByClass(NFasDataNew.class);
+		job.setJarByClass(XFasDataNew3.class);
 
 		job.setMapperClass(NFasDataNew_Mapper.class);
 		job.setCombinerClass(NFasDataNew_Combiner.class);
