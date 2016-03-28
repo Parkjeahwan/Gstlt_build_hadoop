@@ -37,13 +37,11 @@ public class NFasDataNew extends Configured implements Tool
 				for (int k1=1;k1<=u;k1++) {
 					for (int i=0;i<m.length-k0+1;i++) {
 						String m1 = "";
-						HashSet <String> tested = new HashSet <String> ();
 						for (int ii=i;ii<i+k0;ii++) m1 += m1.equals("")? m[ii] : " "+m[ii];
 						for (int j=i+k0;j<m.length-k1+1;j++) {
 							String m2 = "";
 							for (int jj=j;jj<j+k1;jj++) m2 += m2.equals("")? m[jj]:" "+m[jj];
-							if (m1.equals(m2) || tested.contains(m2)) continue;
-							else tested.add(m2);
+							if (m1.equals(m2)) continue;
 							String keys = m1 + " ##SP " + m2;
 							key1.set(keys);
 							context.write(key1, one);

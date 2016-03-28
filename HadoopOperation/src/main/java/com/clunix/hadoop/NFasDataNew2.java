@@ -1,13 +1,18 @@
 package com.clunix.hadoop;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.compress.CompressionCodec;
+import org.apache.hadoop.io.compress.GzipCodec;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -16,38 +21,47 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
-public class FasDataNew extends Configured implements Tool
+public class NFasDataNew2 extends Configured implements Tool
 {
-	public static class FasDataNew_Mapper extends Mapper<Object, Text, Text, LongWritable> {
+	public static class NFasDataNew_Mapper extends Mapper<Object, Text, Text, LongWritable> {
 		private final static LongWritable one = new LongWritable(1);
 
 		public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+			//context.getTaskAttemptID().getTaskID().getId();
 			Text key1 = new Text();
 			String line = value.toString();
-			String m[] = line.split(" ");
-			
-			for (int i=0;i<m.length;i++) {
-				String m1 = m[i];
-				HashSet <String> tested = new HashSet <String> (); 
-				for (int j=i+1;j<m.length;j++) {
-					String m2 = m[j];
-					
-					//길이가 1인 형태소 끼리 출현한 문장의 횟수
-					if (m1.equals(m2) || tested.contains(m2)) continue;
-					else tested.add(m2);
-					
-					//길이가 1인 형태소들이 출현한 횟수(전체에서 카운트)
-					//if (m1.equals(m2)) continue;
-					
-					String key2 = m1 + " " + m2;
-					key1.set(key2);
-					context.write(key1, one);
+			String m3[] = line.split("");
+			line = "";
+			for (int i=0;i<m3.length;i++) {
+				if(m3[i].equals(" "))
+					continue;
+				line += m3[i];
+			}
+			String m[] = line.split("");
+
+			int u = 4;
+			for (int k0=1;k0<=u;k0++) {
+				for (int k1=1;k1<=u;k1++) {
+					for (int i=0;i<m.length-k0+1;i++) {
+						String m1 = "";
+						HashSet <String> tested = new HashSet <String> ();
+						for (int ii=i;ii<i+k0;ii++) m1 += m1.equals("")? m[ii] : " "+m[ii];
+						for (int j=i+k0;j<m.length-k1+1;j++) {
+							String m2 = "";
+							for (int jj=j;jj<j+k1;jj++) m2 += m2.equals("")? m[jj]:" "+m[jj];
+							if (m1.equals(m2) || tested.contains(m2)) continue;
+							else tested.add(m2);
+							String keys = m1 + " ##SP " + m2;
+							key1.set(keys);
+							context.write(key1, one);
+						}
+					}
 				}
-			}	
+			}
 		}
 	}
 	
-	public static class FasDataNew_Combiner extends Reducer<Text, LongWritable, Text, LongWritable> {
+	public static class NFasDataNew_Combiner extends Reducer<Text, LongWritable, Text, LongWritable> {
 		private LongWritable result = new LongWritable();
 		public void reduce(Text key, Iterable<LongWritable> values, Context context)
 				throws IOException, InterruptedException {
@@ -59,10 +73,10 @@ public class FasDataNew extends Configured implements Tool
 			context.write(key, result);
 		}
 	}
-	
-	public static class FasDataNew_Reducer extends Reducer<Text, LongWritable, Text, LongWritable> {
+
+	public static class NFasDataNew_Reducer extends Reducer<Text, LongWritable, Text, LongWritable> {
 		private LongWritable result = new LongWritable();
-		
+
 		public void reduce(Text key, Iterable<LongWritable> values, Context context)
 				throws IOException, InterruptedException {
 			long sum = 0;
@@ -73,12 +87,12 @@ public class FasDataNew extends Configured implements Tool
 			context.write(key, result);
 		}
 	}
-	
+
 	public static void main(String[] args) throws Exception {
-		int res = ToolRunner.run(new Configuration(), new FasDataNew(), args);
+		int res = ToolRunner.run(new Configuration(), new NFasDataNew2(), args);
 		System.exit(res);
 	}
-	
+
 	public int run(String[] args) throws Exception
 	{
 		Configuration conf = this.getConf();
@@ -87,12 +101,15 @@ public class FasDataNew extends Configured implements Tool
 		conf.set("fs.file.impl",
 				org.apache.hadoop.fs.LocalFileSystem.class.getName());
 		conf.set("mapred.textoutputformat.separator", "\t");
+		conf.set("dfs.replication", "1");
 		Job job = Job.getInstance(conf, "Fas Data New get");
-		job.setJarByClass(FasDataNew.class);
+		job.getConfiguration().setBoolean("mapred.output.compress", true);
+		job.getConfiguration().setClass("mapred.output.compression.codec", GzipCodec.class, CompressionCodec.class);
+		job.setJarByClass(NFasDataNew2.class);
 
-		job.setMapperClass(FasDataNew_Mapper.class);
-		job.setCombinerClass(FasDataNew_Combiner.class);
-		job.setReducerClass(FasDataNew_Reducer.class);
+		job.setMapperClass(NFasDataNew_Mapper.class);
+		job.setCombinerClass(NFasDataNew_Combiner.class);
+		job.setReducerClass(NFasDataNew_Reducer.class);
 
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(LongWritable.class);

@@ -33,9 +33,15 @@ public class XFasDataNew extends Configured implements Tool
 
 			int u = 4;
 			for (int k0=1;k0<=u;k0++) {
+				HashSet <String> tested = new HashSet <String> (); 
 				for (int i=0;i<m.length-k0+1;i++) {
 					String m1 = "";
 					for (int ii=i;ii<i+k0;ii++) m1 += m1.equals("")? m[ii] : " "+m[ii];
+					
+					//출현한 문장의 횟수 구하는 로직
+					if (tested.contains(m1)) continue;
+					else tested.add(m1);
+					
 					key1.set(m1);
 					context.write(key1, one);
 				}
