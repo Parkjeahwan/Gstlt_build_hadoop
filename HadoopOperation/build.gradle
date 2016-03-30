@@ -15,7 +15,7 @@ repositories {
     mavenCentral()
 }
 
-mainClassName = 'com.clunix.hadoop.NFasDataNew'
+mainClassName = 'com.clunix.hadoop.NFasDataNew4'
 
 dependencies {
     compile group: 'commons-collections', name: 'commons-collections', version: '3.2'

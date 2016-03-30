@@ -34,10 +34,11 @@ public class NFasDataNew extends Configured implements Tool
 
 			int u = 4;
 			for (int k0=1;k0<=u;k0++) {
-				for (int k1=1;k1<=u;k1++) {
-					for (int i=0;i<m.length-k0+1;i++) {
-						String m1 = "";
-						for (int ii=i;ii<i+k0;ii++) m1 += m1.equals("")? m[ii] : " "+m[ii];
+
+				for (int i=0;i<m.length-k0+1;i++) {
+					String m1 = "";
+					for (int ii=i;ii<i+k0;ii++) m1 += m1.equals("")? m[ii] : " "+m[ii];
+					for (int k1=1;k1<=u;k1++) {
 						for (int j=i+k0;j<m.length-k1+1;j++) {
 							String m2 = "";
 							for (int jj=j;jj<j+k1;jj++) m2 += m2.equals("")? m[jj]:" "+m[jj];
@@ -51,7 +52,7 @@ public class NFasDataNew extends Configured implements Tool
 			}
 		}
 	}
-	
+
 	public static class NFasDataNew_Combiner extends Reducer<Text, LongWritable, Text, LongWritable> {
 		private LongWritable result = new LongWritable();
 		public void reduce(Text key, Iterable<LongWritable> values, Context context)
