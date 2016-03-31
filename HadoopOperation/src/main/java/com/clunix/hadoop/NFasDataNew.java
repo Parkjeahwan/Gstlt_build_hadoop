@@ -32,7 +32,7 @@ public class NFasDataNew extends Configured implements Tool
 			String line = value.toString();
 			String m[] = line.split(" ");
 
-			int u = 4;
+			int u = 3;
 			for (int k0=1;k0<=u;k0++) {
 
 				for (int i=0;i<m.length-k0+1;i++) {

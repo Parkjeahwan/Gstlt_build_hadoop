@@ -27,30 +27,30 @@ public class NFasDataNew3 extends Configured implements Tool
 		private final static LongWritable one = new LongWritable(1);
 
 		public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-			//context.getTaskAttemptID().getTaskID().getId();
 			Text key1 = new Text();
 			String line = value.toString();
 			String m[] = line.split(" ");
 
-			int u = 4;
+			int u = 3;
 			for (int k0=1;k0<=u;k0++) {
 				HashSet <String> checkm1 = new HashSet <String> ();
-				for (int k1=1;k1<=u;k1++) {
-					for (int i=0;i<m.length-k0+1;i++) {
-						String m1 = "";
-						HashSet <String> checkm2 = new HashSet <String> ();
-						for (int ii=i;ii<i+k0;ii++) m1 += m1.equals("")? m[ii] : " "+m[ii];
-						
-						if (checkm1.contains(m1)) continue;
-						else checkm1.add(m1);
-						
+				for (int i=0;i<m.length-k0+1;i++) {
+					HashSet <String> checkm2 = new HashSet <String> ();
+					String m1 = "";
+					for (int ii=i;ii<i+k0;ii++) m1 += m1.equals("")? m[ii] : " "+m[ii];
+
+					if (checkm1.contains(m1)) continue;
+					else checkm1.add(m1);
+
+					for (int k1=1;k1<=u;k1++) {
+
 						for (int j=i+k0;j<m.length-k1+1;j++) {
 							String m2 = "";
 							for (int jj=j;jj<j+k1;jj++) m2 += m2.equals("")? m[jj]:" "+m[jj];
-							
+
 							if (m1.equals(m2) || checkm2.contains(m2)) continue;
 							else checkm2.add(m2);
-							
+
 							String keys = m1 + " ##SP " + m2;
 							key1.set(keys);
 							context.write(key1, one);
@@ -60,7 +60,7 @@ public class NFasDataNew3 extends Configured implements Tool
 			}
 		}
 	}
-	
+
 	public static class NFasDataNew_Combiner extends Reducer<Text, LongWritable, Text, LongWritable> {
 		private LongWritable result = new LongWritable();
 		public void reduce(Text key, Iterable<LongWritable> values, Context context)
