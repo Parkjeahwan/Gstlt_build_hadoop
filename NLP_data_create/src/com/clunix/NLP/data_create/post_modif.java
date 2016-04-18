@@ -22,6 +22,8 @@ public class post_modif
 	final private static String[] poststr = { "을를/JKO", "이가/JKS", "은는/JX", "의/JKG", "에/JKB", "로으로/JKB", "도/JX" };
 	final private static String[] unitNoun = { "쌍/NNG", "짝/NNG", "해/NNG", "가닥/NNG" };
 	final private static String[] subst = { "NNG", "NNP", "NNB", "NNBC", "NR", "NP" };
+	final private static String[] nnlist = { "건강", "환경", "예방", "영상", "재활", "스포츠", "통증", "가정", "수", "치", "응급", "한",
+			"검사", "법", "생명", "정밀", "완화"};
 	final private static String[] ending = { "EP", "EF", "EC", "ECS", "ETN", "ETM" };
 	final private static String[] pred2 = { "VV", "VA", "VX", "VCN", "VCP", "XSV", "XSA" };
 	final private static TreeMap<String, Integer> transMap = new TreeMap<String, Integer>();
@@ -109,6 +111,15 @@ public class post_modif
 			return false;
 		if (infos[1].equals(morp))
 			return true;
+		return false;
+	}
+
+	private static boolean checkNN(String word){
+		for (int i = 0; i < nnlist.length; i++) {
+			if (word.contains(nnlist[i])) {
+				return true;
+			}
+		}
 		return false;
 	}
 
@@ -414,6 +425,34 @@ public class post_modif
 					words[i] = sp_word[0] + "다/EF 고/JKQ";
 					words[i + 1] = "하/VV";
 					s = MP_to_Str(words);
+				}
+			}
+			/*
+			 * 의/JKG ###/SPACE 학과/NNG -> 의학과/NNG 20160418
+			 */
+			if (words[i].equals("의/JKG")) {
+				if (i + 1 < words.length && words[i+1].equals("###/SPACE")) {
+					if (i + 2 < words.length && words[i+2].equals("학과/NNG")) {
+						if (checkNN(words[i-1])) {
+							words[i] = "의학과/NNG";
+							words[i+1] = "";
+							words[i+2] = "";
+							s = MP_to_Str(words);
+						}
+					}
+				}
+			}
+			/*
+			 * xx 와과/JC ###/SPACE 교수/NNG -> xx과/NNG ###/SPACE 교수/NNG 20160418
+			 */
+			if (words[i].equals("와과/JC")) {
+				if (i + 1 < words.length && words[i + 1].equals("###/SPACE")) {
+					if (i + 2 < words.length && words[i + 2].equals("교수/NNG")) {
+						if (words[i - 1].contains("NNG") || words[i - 1].contains("NNP")) {
+							merge_word(words, i - 1);
+							s = MP_to_Str(words);
+						}
+					}
 				}
 			}
 			/*
