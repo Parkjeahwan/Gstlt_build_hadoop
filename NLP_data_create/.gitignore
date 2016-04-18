@@ -1,6 +1,3 @@
-.svn/
-bin/
+/bin/
 /build/
-.gradle/
-/work/
-*.class
+/.gradle/
