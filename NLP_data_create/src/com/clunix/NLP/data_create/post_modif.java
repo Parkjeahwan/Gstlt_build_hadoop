@@ -428,8 +428,18 @@ public class post_modif
 				}
 			}
 			/*
-			 * 의/JKG ###/SPACE 학과/NNG -> 의학과/NNG 20160418
+			 * 엽/NNG 이/VCP  =>  열/VV 20160418
 			 */
+			if (words[i].equals("엽/NNG")) {
+				if (i + 1 < words.length && words[i+1].equals("이/VCP")) {
+					words[i] = "열/VV";
+					words[i+1] = "";
+					s = MP_to_Str(words);
+				}
+			}
+			/*
+			 * 의/JKG ###/SPACE 학과/NNG -> 의학과/NNG 20160418
+			// 적용전
 			if (words[i].equals("의/JKG")) {
 				if (i + 1 < words.length && words[i+1].equals("###/SPACE")) {
 					if (i + 2 < words.length && words[i+2].equals("학과/NNG")) {
@@ -444,7 +454,7 @@ public class post_modif
 			}
 			/*
 			 * xx 와과/JC ###/SPACE 교수/NNG -> xx과/NNG ###/SPACE 교수/NNG 20160418
-			 */
+			// 적용전
 			if (words[i].equals("와과/JC")) {
 				if (i + 1 < words.length && words[i + 1].equals("###/SPACE")) {
 					if (i + 2 < words.length && words[i + 2].equals("교수/NNG")) {
