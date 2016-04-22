@@ -3,6 +3,7 @@ apply plugin: 'eclipse'
 apply plugin: 'application'
 
 sourceCompatibility = 1.7
+
 version = '1.0'
 jar {
     manifest {
