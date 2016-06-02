@@ -216,6 +216,15 @@ public class EdgeSet implements Serializable { // contains a set of edges
 			contexts.put(a, new Contexts(line));
 	}
 
+	public void setEdge(Node a, int n) {
+		if (count == null) {
+			count = new HashMap<Node, Integer>();
+			sortedI = new ArrayList<Node>();
+			contexts = new HashMap<Node, Contexts>();
+		}
+		count.put(a, n);
+	}
+	
 	public void addNext(Node a) throws InterruptedException {
 		addNextCore(a);
 		if (contexts.containsKey(a))
@@ -298,17 +307,27 @@ public class EdgeSet implements Serializable { // contains a set of edges
 	public ArrayList<Node> sort() {
 		if (count.isEmpty())
 			return sortedI;
+		List <NodeInt> toSort = new ArrayList<NodeInt>(count.keySet().size());
+		for (Node x:count.keySet()) toSort.add(new NodeInt(x,count.get(x)));
+		Collections.sort(toSort);
+		sortedI = new ArrayList<Node>(count.keySet().size());
+		for (NodeInt x:toSort) sortedI.add(x.n);
+		if (sortedI != null && sortedI.size() > 1 && count.get(sortedI.get(0)) < count.get(sortedI.get(1))) 
+			System.exit(0);
+/*		
 		if (sortedI == null || sortedI.isEmpty()) {
 			sortedI = new ArrayList<Node>(count.size());
 			sortedI.addAll(count.keySet());
 		}
 		Collections.sort(sortedI, new Comparator<Node>() {
+			@Override
 			public int compare(Node o1, Node o2) {
 				int a = count.get(o1)==null? 0 : count.get(o1);
 				int b = count.get(o2)==null? 0 : count.get(o2);
 				return b - a;
 			}
 		});
+		*/
 		return sortedI;
 	}
 

@@ -53,6 +53,13 @@ public class AGraph implements Externalizable
 		return createNewNode(nb);
 	}
 
+	protected Node createNewNode(String cw, boolean tf)
+	{
+		Node nb = new Node(cw,tf);
+		nb.content = cw;
+		return createNewNode(nb);
+	}
+
 	public Node addNode(String cw)
 	{
 		Node nb;
@@ -305,6 +312,7 @@ public class AGraph implements Externalizable
 		return out.toString();
 	}
 
+	@Override
 	public void writeExternal(ObjectOutput out) throws IOException
 	{
 		out.writeObject(node);
@@ -313,6 +321,7 @@ public class AGraph implements Externalizable
 	}
 
 	@SuppressWarnings("unchecked")
+	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException
 	{
 		node = (ArrayList<Node>) in.readObject();

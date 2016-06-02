@@ -16,7 +16,7 @@ repositories {
     mavenCentral()
 }
 
-mainClassName = 'com.clunix.hadoop.XFasDataNew4'
+mainClassName = 'com.clunix.hadoop.LengthNPairFinder'
 
 dependencies {
     compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
@@ -26,6 +26,9 @@ dependencies {
     def hadoopVersion = '2.6.0'
     compile "org.apache.hadoop:hadoop-common:$hadoopVersion"
     compile "org.apache.hadoop:hadoop-client:$hadoopVersion"
+
+    // http://mvnrepository.com/artifact/org.anarres.lzo/lzo-hadoop
+    compile group: 'org.anarres.lzo', name: 'lzo-hadoop', version: '1.0.5'
     
     // libs
     compile fileTree(dir: 'libs', include: ['*.jar'])

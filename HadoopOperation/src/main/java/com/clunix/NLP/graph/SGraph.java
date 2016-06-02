@@ -6,7 +6,6 @@ import java.io.Externalizable;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
@@ -14,9 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 
 public class SGraph extends AGraph implements Externalizable
 {
@@ -143,23 +139,15 @@ public class SGraph extends AGraph implements Externalizable
 	}
 
 	/**
-	 * @return 
 	 * @deprecated Use SGraphFile.read instead.
 	 */
 	@Deprecated
 	public void filein(String fn) throws IOException
 	{
-		FileSystem hdfs;
-		hdfs = FileSystem.get(new Configuration());
-		Path homeDir = hdfs.getHomeDirectory();
-		Path path = new Path(homeDir + fn + ".node");
-		BufferedReader filen = new BufferedReader(new InputStreamReader(hdfs.open(path)));
-		path = new Path(homeDir + fn + ".PREV");
-		BufferedReader fileP = new BufferedReader(new InputStreamReader(hdfs.open(path)));
-		path = new Path(homeDir + fn + ".SUCC");
-		BufferedReader fileS = new BufferedReader(new InputStreamReader(hdfs.open(path)));
-		path = new Path(homeDir + fn + ".EQUI");
-		BufferedReader fileE = new BufferedReader(new InputStreamReader(hdfs.open(path)));
+		BufferedReader filen = new BufferedReader(new FileReader(fn + ".node"));
+		BufferedReader fileP = new BufferedReader(new FileReader(fn + ".PREV"));
+		BufferedReader fileS = new BufferedReader(new FileReader(fn + ".SUCC"));
+		BufferedReader fileE = new BufferedReader(new FileReader(fn + ".EQUI"));
 		String str = filen.readLine();
 		int size = 0;
 		node = new ArrayList<Node>(size = Integer.parseInt(str));
@@ -262,7 +250,7 @@ public class SGraph extends AGraph implements Externalizable
 				node, G, SUCC, PREV, EQUI);
 	}
 
-	/*@Override
+	@Override
 	public void writeExternal(ObjectOutput out) throws IOException
 	{
 		super.writeExternal(out);
@@ -277,5 +265,5 @@ public class SGraph extends AGraph implements Externalizable
 		super.readExternal(in);
 		PREV = (List<EdgeSet>) in.readObject();
 		SUCC = (List<EdgeSet>) in.readObject();
-	}*/
+	}
 }

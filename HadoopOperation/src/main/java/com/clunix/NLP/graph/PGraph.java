@@ -5,15 +5,13 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.lang.ObjectUtils;
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.Path;
 
 public class PGraph extends AGraph
 {
@@ -49,9 +47,20 @@ public class PGraph extends AGraph
 			PREV.add(new EdgeSet(nb));
 			SUCC.add(new EdgeSet(nb));
 		}
+		return G.get(nb.content);
+	}
+	public Node addNode(String cw, boolean tf)
+	{
+		Node nb;
+		if (!G.containsKey(cw)) {
+			nb = createNewNode(cw,tf);
+			PREV.add(new EdgeSet(nb));
+			SUCC.add(new EdgeSet(nb));
+		}
+		else nb = G.get(cw);
+		
 		return nb;
 	}
-
 	public boolean delNode(Node nb)
 	{
 		if (nb == null) return false;
@@ -136,15 +145,9 @@ public class PGraph extends AGraph
 	@Deprecated
 	public void filein(String fn) throws IOException
 	{
-		FileSystem hdfs;
-		hdfs = FileSystem.get(new Configuration());
-		Path homeDir = hdfs.getHomeDirectory();
-		Path path = new Path(homeDir + fn + ".node");
-		BufferedReader filen = new BufferedReader(new InputStreamReader(hdfs.open(path)));
-		path = new Path(homeDir + fn + ".PREV");
-		BufferedReader fileP = new BufferedReader(new InputStreamReader(hdfs.open(path)));
-		path = new Path(homeDir + fn + ".SUCC");
-		BufferedReader fileS = new BufferedReader(new InputStreamReader(hdfs.open(path)));
+		BufferedReader filen = new BufferedReader(new FileReader(fn + ".node"));
+		BufferedReader fileP = new BufferedReader(new FileReader(fn + ".PREV"));
+		BufferedReader fileS = new BufferedReader(new FileReader(fn + ".SUCC"));
 		String str = filen.readLine();
 		int size = 0;
 		node = new ArrayList<Node>(size = Integer.parseInt(str));
@@ -202,6 +205,25 @@ public class PGraph extends AGraph
 		SUCC.get(n1.ID).count.remove(n2);
 		SUCC.get(n1.ID).sortedI.remove(n2);
 	}
+	
+	public void delEdge(Node n1, Node n2)
+	{
+		if (!node.contains(n1)) {
+			System.out.println(n1.content + " is not registered node");
+			return;
+		}
+		if (!node.contains(n2)) {
+			System.out.println(n2.content + " is not registered node");
+			return;
+		}
+		PREV.get(n1.ID).contexts.remove(n2);
+		PREV.get(n1.ID).count.remove(n2);
+		PREV.get(n1.ID).sortedI.remove(n2);
+		SUCC.get(n1.ID).contexts.remove(n2);
+		SUCC.get(n1.ID).count.remove(n2);
+		SUCC.get(n1.ID).sortedI.remove(n2);
+	}
+
 
 	public void sortEdge()
 	{
@@ -231,5 +253,117 @@ public class PGraph extends AGraph
 		return String.format("%s{node=[%s],G=[%s],SUCC=[%s],PREV=[%s]}",
 				this.getClass().getSimpleName(),
 				node, G, SUCC, PREV);
+	}
+
+	public void addAllEdges(Node na, Node nb, PGraph g, PGraph h) {
+		String ac = na.content;
+		String bc = nb.content;
+		String a[] = ac.split(" ");
+		String b[] = bc.split(" ");
+		
+		
+	}
+	public void addAllEdges(String ac, String bc, PGraph g, PGraph h) throws InterruptedException {
+		String a[] = ac.split(" ");
+		String b[] = bc.split(" ");
+		
+		HashSet<String> ca = incrementalDecompostions(Arrays.asList(a),g,h);
+		HashSet<String> cb = allDecompostions(Arrays.asList(b),g,h);
+		
+		for (String A:ca) 
+			for (String B:cb) 
+				if (A.contains(" ") || B.contains(" ")) {
+					if (g.G.containsKey(A)) g.G.get(A).count++;
+					else g.addNode(new Node(A));
+					
+					g.SUCC.get(g.G.get(A).ID).addNext(g.G.get(B));
+					if (B.equals("챔피언/NNG 스리/NNG 스리/NNG.*.") && A.equals("UEFA/SL )/SSC"))
+						{int xs = 1;}
+					g.PREV.get(
+							g.G.get(B).ID).
+					addNext(
+							g.G.get(A));
+				}
+		
+	}
+	public void showAllEdges(String ac, String bc, PGraph f, PGraph g, PGraph h) throws InterruptedException {
+		String a[] = ac.split(" ");
+		String b[] = bc.split(" ");
+		
+		HashSet<String> ca = incrementalDecompostions(Arrays.asList(a),g,h);
+		HashSet<String> cb = allDecompostions(Arrays.asList(b),g,h);
+		
+		for (String A:ca) 
+			for (String B:cb) 
+				if (
+					f.SUCC.get(f.G.get(A).ID).hasNext(f.G.get(B))){ 
+					System.out.println("\t"+A+"=>"+B);
+					
+/*					g.SUCC.get(g.G.get(A).ID).addNext(g.G.get(B));
+					if (B.equals("챔피언/NNG 스리/NNG 스리/NNG.*.") && A.equals("UEFA/SL )/SSC"))
+						{int xs = 1;}
+					g.PREV.get(
+							g.G.get(B).ID).
+					addNext(
+							g.G.get(A));
+							*/
+				}
+		
+	}
+	public HashSet<String> incrementalDecompostions(List <String> s,PGraph g, PGraph h) {
+		HashSet<String> res = new HashSet <String> ();
+		String seed = "";
+		int ss = s.size()-1;
+		if (ss>=0) seed = s.get(ss);
+		res.add(seed);
+		for (int i=ss-1;i>=0;i--){
+			res.add(seed = s.get(i)+" "+seed);
+		}
+		return res;
+	}
+	
+	public HashSet<String> allDecompostions(List <String> s,PGraph g, PGraph h) {
+		List<String> r = new ArrayList<String> ();
+		HashSet<String> res = new HashSet <String> ();
+		int sl = s.size();
+		if (sl == 2){
+			r.add(s.get(0)+" "+s.get(1));
+			String astar = s.get(0)+".*.";
+			if (h.G.containsKey(astar) && h.SUCC.get(h.G.get(astar).ID).hasNext(h.G.get(s.get(1))))
+				r.add(s.get(0)+" "+astar);
+			astar = ".*."+s.get(1);
+			if (h.G.containsKey(astar) && h.SUCC.get(h.G.get(astar).ID).hasNext(h.G.get(s.get(0))))
+				r.add(astar+" "+s.get(1));
+		}
+		else  if (sl > 2) {
+			HashSet<String> D;
+			
+			String s0 = s.get(0);
+			List<String> stail = s.subList(1, sl);
+			for (String x:D=allDecompostions(stail,g,h)) { 
+				r.add(s0+" "+x);
+				String astar = s0+".*.";
+				if (h.G.containsKey(astar) && h.SUCC.get(h.G.get(astar).ID).hasNext(h.G.get(x)))
+					r.add(s0+" "+astar);
+				astar = ".*."+x;
+				if (h.G.containsKey(astar) && h.SUCC.get(h.G.get(astar).ID).hasNext(h.G.get(s0)))
+					r.add(astar+" "+x);
+			}
+			String sf = s.get(sl-1);
+			List<String> shead = s.subList(0, sl-1);
+			for (String x:D=allDecompostions(shead,g,h)) { 
+				r.add(x+" "+sf);
+				String astar = x+".*.";
+				if (h.G.containsKey(astar) && h.SUCC.get(h.G.get(astar).ID).hasNext(h.G.get(sf)))
+					r.add(x+" "+astar);
+				astar = ".*."+sf;
+				if (h.G.containsKey(astar) && h.SUCC.get(h.G.get(astar).ID).hasNext(h.G.get(x)))
+					r.add(astar+" "+sf);
+			}
+		}
+		else r.add(s.get(0));
+		for (String x:r) 
+			if (g.G.containsKey(x)) res.add(x);
+		return res;
 	}
 }
