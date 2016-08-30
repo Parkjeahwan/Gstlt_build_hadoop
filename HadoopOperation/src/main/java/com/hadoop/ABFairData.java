@@ -97,7 +97,7 @@ public class ABFairData extends Configured implements Tool
 		conf.set("fs.file.impl",
 				org.apache.hadoop.fs.LocalFileSystem.class.getName());
 		conf.set("mapred.textoutputformat.separator", "\t");
-		conf.set("dfs.replication", "1");
+		//conf.set("dfs.replication", "1");
 		Job job = Job.getInstance(conf, "Fas Data New get");
 		job.getConfiguration().setBoolean("mapred.output.compress", true);
 		job.getConfiguration().setClass("mapred.output.compression.codec", SnappyCodec.class, CompressionCodec.class);

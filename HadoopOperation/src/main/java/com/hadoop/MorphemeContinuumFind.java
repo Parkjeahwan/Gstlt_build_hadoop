@@ -16,6 +16,7 @@ import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
 import java.io.IOException;
+import java.util.HashSet;
 
 public class MorphemeContinuumFind extends Configured implements Tool {
     public static class NFasDataNew_Mapper extends Mapper<Object, Text, Text, LongWritable> {
@@ -24,26 +25,26 @@ public class MorphemeContinuumFind extends Configured implements Tool {
         public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
             Text key1 = new Text();
             String line = value.toString();
-            String m[] = line.split(" ");
+            char m[] = line.toCharArray();
 
             int u = 10;
             for (int k0 = 1; k0 <= u; k0++) {
-                //HashSet <String> checkm1 = new HashSet <String> ();
+                HashSet<String> checkm1 = new HashSet <String> ();
                 for (int i = 0; i < m.length - k0 + 1; i++) {
-                    //HashSet <String> checkm2 = new HashSet <String> ();
+                    HashSet <String> checkm2 = new HashSet <String> ();
                     String m1 = "";
                     for (int ii = i; ii < i + k0; ii++) m1 += m1.equals("") ? m[ii] : " " + m[ii];
 
-                    //if (checkm1.contains(m1)) continue;
-                    //else checkm1.add(m1);
+                    if (checkm1.contains(m1)) continue;
+                    else checkm1.add(m1);
 
                     for (int k1 = 1; k1 <= u; k1++) {
                         String m2 = "";
                         for (int j = i + k0; i < m.length - k0 - k1 + 1 && j < i + k0 + k1; j++) m2 += m2.equals("") ? m[j] : " " + m[j];
                         if(m2.equals("")) continue;
 
-                        //if (m1.equals(m2) || checkm2.contains(m2)) continue;
-                        //else checkm2.add(m2);
+                        if (m1.equals(m2) || checkm2.contains(m2)) continue;
+                        else checkm2.add(m2);
 
                         String keys = m1 + " ##SP " + m2;
                         key1.set(keys);
@@ -94,8 +95,8 @@ public class MorphemeContinuumFind extends Configured implements Tool {
         conf.set("fs.file.impl",
                 org.apache.hadoop.fs.LocalFileSystem.class.getName());
         conf.set("mapred.textoutputformat.separator", "\t");
-        conf.set("dfs.replication", "1");
-        Job job = Job.getInstance(conf, "Fas Data New get");
+        //conf.set("dfs.replication", "1");
+        Job job = Job.getInstance(conf, "N pair near Morpheme!");
         job.getConfiguration().setBoolean("mapred.output.compress", true);
         job.getConfiguration().setClass("mapred.output.compression.codec", SnappyCodec.class, CompressionCodec.class);
         job.setJarByClass(MorphemeContinuumFind.class);
