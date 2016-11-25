@@ -1,17 +1,17 @@
 package com.clunix;
 
-import static org.junit.Assert.fail;
-
+import com.clunix.Gstlt_build.Gstlt_build_Mapper;
+import com.clunix.Gstlt_build.Gstlt_build_Reducer;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapred.Mapper;
 import org.apache.hadoop.mrunit.MapDriver;
 import org.apache.hadoop.mrunit.mapreduce.MapReduceDriver;
 import org.apache.hadoop.mrunit.mapreduce.ReduceDriver;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import com.clunix.Gstlt_build.Gstlt_build_Mapper;
-import com.clunix.Gstlt_build.Gstlt_build_Reducer;
+import static org.junit.Assert.fail;
 
 public class Gstlt_utilsTest
 {
@@ -27,7 +27,8 @@ public class Gstlt_utilsTest
 		reduceDriver = ReduceDriver.newReduceDriver(reducer);
 		mapReduceDriver = MapReduceDriver.newMapReduceDriver(mapper, reducer);
 	}
-	
+
+	@Ignore
 	@Test
 	public void test()
 	{

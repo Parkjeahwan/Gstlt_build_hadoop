@@ -2,7 +2,6 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -23,7 +22,7 @@ public class MorphemeContinuumF {
             System.out.println(str);
             String m[] = str.split(" ");
             int u = 1;
-            /*for (int k0 = 1; k0 <= u; k0++) {
+            for (int k0 = 1; k0 <= u; k0++) {
                 //HashSet <String> checkm1 = new HashSet <String> ();
                 for (int i = 0; i < m.length - k0 + 1; i++) {
                     //HashSet <String> checkm2 = new HashSet <String> ();
@@ -45,9 +44,9 @@ public class MorphemeContinuumF {
                         list.add(keys);
                     }
                 }
-            }*/
+            }
 
-            for (int k0=1;k0<=u;k0++) {
+            /*for (int k0=1;k0<=u;k0++) {
                 HashSet<String> checkm1 = new HashSet <String> ();
                 for (int i=0;i<m.length-k0+1;i++) {
                     HashSet <String> checkm2 = new HashSet <String> ();
@@ -71,7 +70,7 @@ public class MorphemeContinuumF {
                         }
                     }
                 }
-            }
+            }*/
 
         }
 
